@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ccc;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Data Viewer</h1>
+    <button id="fetchPlannedProcurement">Fetch Planned Procurement List</button>
+    <pre id="response"></pre>
+
+    <script>
+        async function fetchData(endpoint) {
+            const url = `https://api.onegov.nsw.gov.au${endpoint}`;
+            const options = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer kjnTRBiu5hQA41TW7qqLOAR9q5Iv", // Replace with a valid token
+                    "Apikey": "GAOTu9pI4uFD3tjp8wJv4i8AHlb2p6SP" // Replace with a valid API key
+                }
+            };
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                document.getElementById("response").textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById("response").textContent = `Error: ${error.message}`;
+            }
+        }
+
+        document.getElementById("fetchPlannedProcurement").addEventListener("click", () => {
+            fetchData("/etender/v1/plannedprocurementlist?keyword=0");
+        });
+    </script>
+</body>
+</html>
