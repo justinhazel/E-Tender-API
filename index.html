@@ -18,20 +18,25 @@
     const API_SECRET = "hAfxSmMepBMn5iIX";
     let accessToken = ""; // Store the access token here
 
+    // Function to encode client credentials to Base64
+    function getAuthHeader() {
+      return "Basic " + btoa(`${API_KEY}:${API_SECRET}`);
+    }
+
     // Fetch Access Token
     async function fetchAccessToken() {
       try {
         const response = await fetch(`${API_BASE_URL}/oauth/client_credential/accesstoken`, {
           method: "POST",
           headers: {
-            "Authorization": "Basic " + btoa(`${API_KEY}:${API_SECRET}`),
+            "Authorization": getAuthHeader(),
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ grant_type: "client_credentials" }),
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch access token: ${response.status}`);
+          throw new Error(`Failed to fetch access token: HTTP ${response.status}`);
         }
 
         const data = await response.json();
@@ -60,7 +65,7 @@
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch contract list: ${response.status}`);
+          throw new Error(`Failed to fetch contract list: HTTP ${response.status}`);
         }
 
         const data = await response.json();
@@ -88,7 +93,7 @@
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch planned procurement list: ${response.status}`);
+          throw new Error(`Failed to fetch planned procurement list: HTTP ${response.status}`);
         }
 
         const data = await response.json();
