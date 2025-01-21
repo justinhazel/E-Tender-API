@@ -8,7 +8,11 @@
 <body>
   <h1>TfNSW API Data Viewer</h1>
   <button onclick="fetchPlannedProcurementList()">Fetch Planned Procurement List</button>
+  <button onclick="fetchPlannedProcurementDetails()">Fetch Planned Procurement Details</button>
   <button onclick="fetchContractList()">Fetch Contract List</button>
+  <button onclick="fetchContractDetails()">Fetch Contract Details</button>
+  <button onclick="fetchStandingOfferNoticeList()">Fetch Standing Offer Notice List</button>
+  <button onclick="fetchStandingOfferNoticeDetails()">Fetch Standing Offer Notice Details</button>
   <pre id="api-response">API Response will appear here...</pre>
 
   <script>
@@ -16,7 +20,7 @@
     const ACCESS_TOKEN = "Bearer kjnTRBiu5hQA4T1W7qqLOAR9q5lv"; // Use the provided access token
     const API_KEY = "GAOTu9pI4uFD3tjp8wJv4i8AHlb2p6SP";
 
-    // Function to fetch Planned Procurement List
+    // Fetch Planned Procurement List
     async function fetchPlannedProcurementList() {
       try {
         const response = await fetch(`${API_BASE_URL}/etender/v1/plannedprocurementlist?startRow=0`, {
@@ -39,7 +43,36 @@
       }
     }
 
-    // Function to fetch Contract List
+    // Fetch Planned Procurement Details
+    async function fetchPlannedProcurementDetails() {
+      const uuid = prompt("Enter Planned Procurement UUID:");
+      if (!uuid) {
+        document.getElementById("api-response").innerText = "Error: Planned Procurement UUID is required.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/etender/v1/plannedprocurementdetails?PlannedProcurementUUID=${uuid}`, {
+          method: "GET",
+          headers: {
+            "Authorization": ACCESS_TOKEN,
+            "apikey": API_KEY,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch planned procurement details: ${response.status}`);
+        }
+
+        const data = await response.json();
+        document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById("api-response").innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Fetch Contract List
     async function fetchContractList() {
       try {
         const response = await fetch(`${API_BASE_URL}/etender/v1/contractlist?startRow=0`, {
@@ -53,6 +86,87 @@
 
         if (!response.ok) {
           throw new Error(`Failed to fetch contract list: ${response.status}`);
+        }
+
+        const data = await response.json();
+        document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById("api-response").innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Fetch Contract Details
+    async function fetchContractDetails() {
+      const cnuuid = prompt("Enter Contract UUID:");
+      if (!cnuuid) {
+        document.getElementById("api-response").innerText = "Error: Contract UUID is required.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/etender/v1/contractdetails?CNUUID=${cnuuid}`, {
+          method: "GET",
+          headers: {
+            "Authorization": ACCESS_TOKEN,
+            "apikey": API_KEY,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch contract details: ${response.status}`);
+        }
+
+        const data = await response.json();
+        document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById("api-response").innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Fetch Standing Offer Notice List
+    async function fetchStandingOfferNoticeList() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/etender/v1/standingoffernoticelist?startRow=0`, {
+          method: "GET",
+          headers: {
+            "Authorization": ACCESS_TOKEN,
+            "apikey": API_KEY,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch standing offer notice list: ${response.status}`);
+        }
+
+        const data = await response.json();
+        document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById("api-response").innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Fetch Standing Offer Notice Details
+    async function fetchStandingOfferNoticeDetails() {
+      const sonuuid = prompt("Enter Standing Offer Notice UUID:");
+      if (!sonuuid) {
+        document.getElementById("api-response").innerText = "Error: Standing Offer Notice UUID is required.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/etender/v1/standingoffernoticedetails?SONUUID=${sonuuid}`, {
+          method: "GET",
+          headers: {
+            "Authorization": ACCESS_TOKEN,
+            "apikey": API_KEY,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch standing offer notice details: ${response.status}`);
         }
 
         const data = await response.json();
