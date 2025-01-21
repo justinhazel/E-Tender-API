@@ -1,58 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Data Viewer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        button {
-            margin: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-        pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border: 1px solid #ccc;
-            overflow-x: auto;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TfNSW API Data Viewer</title>
 </head>
 <body>
-    <h1>API Data Viewer</h1>
-    <button id="fetchPlannedProcurement">Fetch Planned Procurement List</button>
-    <pre id="response"></pre>
+  <h1>TfNSW API Data Viewer</h1>
+  <button onclick="fetchAccessToken()">Fetch Access Token</button>
+  <button onclick="fetchContractList()">Fetch Contract List</button>
+  <button onclick="fetchPlannedProcurementList()">Fetch Planned Procurement List</button>
+  <pre id="api-response">API Response will appear here...</pre>
 
-    <script>
-        async function fetchData(endpoint) {
-            const url = `https://api.onegov.nsw.gov.au${endpoint}`;
-            const options = {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer kjnTRBiu5hQA4T1W7qqLOAR9q5lv", // Replace with a valid token
-                    "Apikey": "GAOTu9pI4uFD3tjp8wJv4i8AHlb2p6SP" // Replace with a valid API key
-                }
-            };
-            try {
-                const response = await fetch(url, options);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                document.getElementById("response").textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                document.getElementById("response").textContent = `Error: ${error.message}`;
-            }
+  <script>
+    const API_BASE_URL = "https://api.onegov.nsw.gov.au";
+    const API_KEY = "GAOTu9pI4uFD3tjp8wJv4i8AHlb2p6SP";
+    const API_SECRET = "hAfxSmMepBMn5iIX";
+    let accessToken = ""; // Store the access token here
+
+    // Fetch Access Token
+    async function fetchAccessToken() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/oauth/client_credential/accesstoken`, {
+          method: "POST",
+          headers: {
+            "Authorization": "Basic " + btoa(`${API_KEY}:${API_SECRET}`),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ grant_type: "client_credentials" }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch access token: ${response.status}`);
         }
 
-        document.getElementById("fetchPlannedProcurement").addEventListener("click", () => {
-            fetchData("/etender/v1/plannedprocurementlist?keyword=0");
+        const data = await response.json();
+        accessToken = data.access_token;
+        document.getElementById("api-response").innerText = `Access Token: ${accessToken}`;
+      } catch (error) {
+        document.getElementById("api-response").innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Fetch Contract List
+    async function fetchContractList() {
+      if (!accessToken) {
+        document.getElementById("api-response").innerText = "Error: Fetch the access token first.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/etender/v1/contractlist?startRow=0`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "apikey": API_KEY,
+            "Content-Type": "application/json",
+          },
         });
-    </script>
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch contract list: ${response.status}`);
+        }
+
+        const data = await response.json();
+        document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById("api-response").innerText = `Error: ${error.message}`;
+      }
+    }
+
+    // Fetch Planned Procurement List
+    async function fetchPlannedProcurementList() {
+      if (!accessToken) {
+        document.getElementById("api-response").innerText = "Error: Fetch the access token first.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/etender/v1/plannedprocurementlist?startRow=0`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "apikey": API_KEY,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch planned procurement list: ${response.status}`);
+        }
+
+        const data = await response.json();
+        document.getElementById("api-response").innerText = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById("api-response").innerText = `Error: ${error.message}`;
+      }
+    }
+  </script>
 </body>
 </html>
